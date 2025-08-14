@@ -4,7 +4,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.sql.PreparedStatement;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 // import javax.sql.*;
@@ -56,8 +60,64 @@ public class DBDriver {
             System.out.println("Error: "+ e.getMessage());
         }
     }
-    public int Insert(String dbName, String table, String column, JsonObject data){
-        
+
+    /*
+     * Insert data on a table
+     * @param data: is a JsonObject that contains the information
+     * it is constructed as next.
+     * "table":"table name", "values":[{"column":"entry"}]
+     */
+    public int DbInsert(JsonObject data){
+        try{
+            Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
+            Statement s = c.createStatement();
+            //construccion de la query, inicio
+            String query = "INSERT INTO "+data.get("table").getAsString()+"(";
+            //obtension de las claves
+            JsonArray fields = data.get("fields").getAsJsonArray();
+            JsonObject first = data.get("fields").getAsJsonArray().get(0).getAsJsonObject();
+            List<String> keys = new ArrayList<>(first.keySet());
+            for (int i = 0; i< keys.size() -1; i++){
+                query += keys.get(i) + ',';
+            }
+            query += keys.get(keys.size()-1) + ") VALUES (";
+            //obtener cantidad de insersiones
+            int size = data.get("fields").getAsJsonArray().size();
+            // obtener cantidad de insersiones
+            int cols = fields.get(0).getAsJsonObject().size();
+            System.out.println(cols);
+            for(int i = 0; i< size; i++){
+                for (int j = 0; j< cols-1; j++){
+                    query += "?, ";
+                }
+                // query += "?)";
+                query = (i != size-1)? query+ "?),(" : query + "?);";
+            }
+            PreparedStatement prep = c.prepareStatement(query);
+            int k = 0;
+            for(int i = 0; i< size+cols;i+=cols){
+                for(int j = 0; j< cols; j++){
+                    System.out.println(""+i + j + k);
+                    System.out.println(keys.get(j));
+                    if(fields.get(k).getAsJsonObject().get(keys.get(j)).getAsJsonPrimitive().isString()){ 
+                        prep.setString(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsString());
+                     } else if (fields.get(k).getAsJsonObject().get(keys.get(j)).getAsJsonPrimitive().isNumber()){ 
+                        prep.setInt(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsInt());
+                     } else{
+                         prep.setBoolean(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsBoolean());
+                     }
+                }
+                k++;
+            }
+            System.out.println(prep);
+            prep.executeUpdate();
+            //
+            // System.out.println("Se creo la query "+ prep);
+            // System.out.println(prep.executeUpdate());
+            c.close();
+        } catch (Exception e){
+            System.out.println("Error: "+e.getMessage());
+        }
         return 1;
     }
 }

@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.Gson;
 
 // import javax.sql.*;
 
@@ -18,12 +20,20 @@ public class DBDriver {
     final private String usr = "root";
     final private String pswd = "bujinkanbud0";
     
-    public void CreateDatabase(){
+    public DBDriver(){
+        
+    }
+
+
+
+    public void CreateDatabase(String dbName){
         System.out.println("Hola Driver");
+        //convertir el body que llego a JSON
+        JsonObject json = JsonParser.parseString(dbName).getAsJsonObject();
         try{
             Connection c = DriverManager.getConnection("jdbc:mysql://localhost", "root", "bujinkanbud0");
             Statement stm = c.createStatement();
-            stm.executeUpdate("CREATE DATABASE IF NOT EXISTS test;");
+            stm.executeUpdate("CREATE DATABASE IF NOT EXISTS " +json.get("name").getAsString() + ";");
             System.out.println("Base de datos creada o existente");
             c.close();
         }catch(Exception e){
@@ -43,13 +53,18 @@ public class DBDriver {
             System.out.println("Error: " + e.getMessage());
         }
     }
-    public void CreateTable(String dbName, String tableName, String[] columns){
+    public void CreateTable(String body){
+        JsonObject jsonBody = JsonParser.parseString(body).getAsJsonObject();
+
         try{
-            Connection c = DriverManager.getConnection(url+"/"+dbName, usr, pswd);
+            Connection c = DriverManager.getConnection(url+"/"+jsonBody.get("dbName").getAsString(), usr, pswd);
             Statement s = c.createStatement();
-            System.out.println("Conexion lograda con "+dbName);
-            String query = "CREATE TABLE IF NOT EXISTS "+tableName +"(\n";
-            for (String column : columns) {
+            System.out.println("Conexion lograda con "+jsonBody.get("dbName").getAsString());
+            String query = "CREATE TABLE IF NOT EXISTS "+jsonBody.get("tableName").getAsString() +"(\n";
+            JsonArray columns = jsonBody.get("columns").getAsJsonArray();
+            Gson gson = new Gson();
+            String[] cols = gson.fromJson(columns, String[].class);
+            for (String column : cols) {
                 query += column;
             }
             query += ");";

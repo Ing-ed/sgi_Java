@@ -3,11 +3,18 @@ package com.example.demo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
 public class GetContoller {
+    private DBDriver driver;
+    public GetContoller(){
+        driver = new DBDriver();
+    }
+
+    //definicion de endpoints
 
     @GetMapping("/")
     public String HolaMundo(){
@@ -21,6 +28,31 @@ public class GetContoller {
         
         return "OK";
     }
+    @PostMapping("/createDB")
+    public String CreateDB(@RequestBody String body){
+        driver.CreateDatabase(body);
+        System.out.println(body);
+        return "OK";
+    }
     
+
+    /**
+     * 
+     * @param body must have the following shape:
+     * "dbName - the name of the database"
+     * tableName - name of the table to create
+     * columns - an array with the name of the columns on the table.
+     * @return "OK or an ERROR"
+     */
+    @PostMapping("/createTable")
+    public String CreateTable(@RequestBody String body){
+        driver.CreateTable(body);
+        return "OK";
+    }
+
+    @PutMapping("/InsertData")
+    public String InsertData(@RequestBody String body){
+        return "Ok";
+    }
 
 }

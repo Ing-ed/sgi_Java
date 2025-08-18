@@ -1,16 +1,23 @@
 package com.example.demo;
 
+import java.util.HashMap;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.val;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
-public class GetContoller {
+public class Router {
     private DBDriver driver;
-    public GetContoller(){
+    public Router(){
         driver = new DBDriver();
     }
 
@@ -54,5 +61,13 @@ public class GetContoller {
     public String InsertData(@RequestBody String body){
         return "Ok";
     }
+    
+    @GetMapping("/dbquery")
+    public String getMethodName(@RequestParam String tableName, @RequestParam String[] columns, @RequestParam (required = false) HashMap<String, String> options) {
+      
+        driver.DBQuery(tableName, columns, options);
+        return new String();
+    }
+    
 
 }

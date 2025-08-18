@@ -5,12 +5,17 @@ import java.sql.ResultSet;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.sql.PreparedStatement;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import lombok.val;
+
 import com.google.gson.Gson;
 
 // import javax.sql.*;
@@ -19,14 +24,18 @@ public class DBDriver {
     final private String url = "jdbc:mysql://localhost";
     final private String usr = "root";
     final private String pswd = "bujinkanbud0";
-    
+    private String dbName = "";
+
+    public DBDriver(String dbName){
+        this.dbName = dbName;
+    }
     public DBDriver(){
         
     }
 
 
 
-    public void CreateDatabase(String dbName){
+    public int CreateDatabase(String dbName){
         System.out.println("Hola Driver");
         //convertir el body que llego a JSON
         JsonObject json = JsonParser.parseString(dbName).getAsJsonObject();
@@ -36,8 +45,10 @@ public class DBDriver {
             stm.executeUpdate("CREATE DATABASE IF NOT EXISTS " +json.get("name").getAsString() + ";");
             System.out.println("Base de datos creada o existente");
             c.close();
+            return 0;
         }catch(Exception e){
             System.out.println("Ocurrio un error: " + e.getMessage());
+            return 1;
         }
         
     }
@@ -53,7 +64,7 @@ public class DBDriver {
             System.out.println("Error: " + e.getMessage());
         }
     }
-    public void CreateTable(String body){
+    public int CreateTable(String body){
         JsonObject jsonBody = JsonParser.parseString(body).getAsJsonObject();
 
         try{
@@ -71,8 +82,10 @@ public class DBDriver {
             s.executeUpdate(query);
             System.out.println("se creo la tabla correctamente");
             c.close();
+            return 0;
         } catch (Exception e){
             System.out.println("Error: "+ e.getMessage());
+            return 1;
         }
     }
 
@@ -85,7 +98,6 @@ public class DBDriver {
     public int DbInsert(JsonObject data){
         try{
             Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
-            Statement s = c.createStatement();
             //construccion de la query, inicio
             String query = "INSERT INTO "+data.get("table").getAsString()+"(";
             //obtension de las claves
@@ -108,6 +120,9 @@ public class DBDriver {
                 // query += "?)";
                 query = (i != size-1)? query+ "?),(" : query + "?);";
             }
+            /* here, I use 3 different index, i for match columns and JSONs numbers
+               j for walk through JSON keys and k for walk through array's JSONs.
+            */
             PreparedStatement prep = c.prepareStatement(query);
             int k = 0;
             for(int i = 0; i< size+cols;i+=cols){
@@ -126,13 +141,42 @@ public class DBDriver {
             }
             System.out.println(prep);
             prep.executeUpdate();
-            //
-            // System.out.println("Se creo la query "+ prep);
-            // System.out.println(prep.executeUpdate());
             c.close();
+            return 0;
         } catch (Exception e){
             System.out.println("Error: "+e.getMessage());
+            return 1;
         }
-        return 1;
+    }
+
+    /**
+     * DBQuery: take a String as argument that conains the following structure.
+     * dbName -> name of the database
+     * tableName -> name of the table to query
+     * query -> a string with the query
+     */
+    public String DBQuery(String tableName, String[] columns, HashMap<String, String> options){
+        try{
+            Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
+            String query = "SELECT ";
+            for (int i = 0; i < columns.length - 1; i++){
+                query += columns[i]+",";
+            }
+            query += columns[columns.length -1] + " FROM " + tableName + "(";
+            List<Map.Entry<String,String>> optionList = new ArrayList<>(options.entrySet());
+            for (int i = 0; i< optionList.size()-1; i++){
+                query += optionList.get(i).getKey() + ",";
+            }
+            query+= optionList.get(optionList.size()-1).getKey() + ") VALUES (";
+            for (int i = 0; i< optionList.size()-1; i++){
+                query += "?,";
+            }
+            query+= ")";
+            System.out.println("Query -> " + query);
+            return "OK";
+        } catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
+            return "Error: " + e.getMessage();
+        }
     }
 }

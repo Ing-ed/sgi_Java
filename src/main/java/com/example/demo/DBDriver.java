@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.sql.PreparedStatement;
 
 import com.google.gson.JsonArray;
@@ -179,35 +180,29 @@ public class DBDriver {
         try{
             Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
             String query = "SELECT ";
-            if(columns.length > 1){
-                for (int i = 0; i < columns.length - 1; i++){
-                    query += columns[i]+",";
-                }
-                query += columns[columns.length -1] + " FROM " + tableName + "WHERE ";
-            } else {
-                query += columns[0] + " FROM " + tableName;// + "WHERE ";
-            }
+            query += String.join(",", columns) + " FROM " + tableName;
             List<Map.Entry<String,Object>> optionList = new ArrayList<>(options.entrySet());
-            if(optionList.size() >1){
-                for (int i = 0; i< optionList.size()-1; i++){
-                    // query += optionList.get(i).getKey() + " = " + optionList.get(i).getValue() + " AND ";
-                    query += "? = ? AND ";
-                }
-                // query += optionList.get(optionList.size()-1).getKey() + " = " + optionList.get(optionList.size()-1).getValue();
-                query += "? AND ?;";
+             StringJoiner sj = new StringJoiner(" = ? AND",
+                (optionList.size() > 0)? " WHERE ": "",
+                " = ?");
+            for (int i = 0; i< optionList.size(); i++){
+                // query += optionList.get(i).getKey() + " = " + optionList.get(i).getValue() + " AND ";
+                sj.add(optionList.get(i).getKey());
             }
+                // query += optionList.get(optionList.size()-1).getKey() + " = " + optionList.get(optionList.size()-1).getValue();
+            query += sj.toString();
             System.out.println(query);
             PreparedStatement prep = c.prepareStatement(query);
-            for (int i = 0; i< optionList.size()-1; i=i+2){
-                prep.setString(i, optionList.get(i).getKey());
-                if(optionList.get(i+1).getValue() instanceof String){
-                    prep.setString(i+1,(String) optionList.get(i+1).getValue());
-                } else if(optionList.get(i+1).getValue() instanceof Integer){
-                    prep.setInt(i+1,(Integer) optionList.get(i+1).getValue());
+            for (int i = 0; i< optionList.size(); i=i+1){
+                if(optionList.get(i).getValue() instanceof String){
+                    prep.setString(i+1,(String) optionList.get(i).getValue());
+                } else if(optionList.get(i).getValue() instanceof Integer){
+                    prep.setInt(i+1,(Integer) optionList.get(i).getValue());
                 } else {
-                    prep.setBoolean(i+1,(Boolean) optionList.get(i+1).getValue());
+                    prep.setBoolean(i+1,(Boolean) optionList.get(i).getValue());
                 } 
             }
+            System.out.println("query : " + prep.toString());
             ResultSet res = prep.executeQuery();
             JsonObject resp = new JsonObject();
             JsonArray array = new JsonArray();

@@ -93,13 +93,14 @@ public class Router {
         HashMap<String, Object> newMap = new HashMap<>();
         if(options != null){
             for (Map.Entry<String,String> entry : options.entrySet()){
-                // String key = entry.getKey();
-                // Object val = ParseString(entry.getValue());
-                newMap.put(entry.getKey(), ParseString(entry.getValue()));
+                if(!entry.getKey().equals("tableName") && !entry.getKey().equals("columns")){
+                    newMap.put(entry.getKey(), ParseString(entry.getValue()));
+                }
             }
             System.out.println(newMap);
         }
-        System.out.println(columns);
+        System.out.println(columns.toString());
+        System.out.println(options);
         String result = driver.DBQuery(tableName, columns, newMap);
         return result;
        

@@ -2,6 +2,7 @@ package com.example.demo;
 
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import lombok.val;
 
 import com.google.gson.Gson;
 
@@ -33,6 +33,25 @@ public class DBDriver {
         
     }
 
+    private JsonObject FillJson(ResultSet res)throws Exception{
+        ResultSetMetaData md = res.getMetaData();
+        JsonObject json = new JsonObject();
+        int colCount = md.getColumnCount();
+        for(int i = 1; i<=colCount;i++){
+            String colName = md.getColumnLabel(i);
+            Object value = res.getObject(i);
+            if(value == null){
+                json.addProperty(colName,(String) null);
+            } else if(value instanceof String){
+                json.addProperty(colName, (String) value);
+            } else if(value instanceof Integer){
+                json.addProperty(colName,(Integer) value);
+            } else {
+                json.addProperty(colName, (Boolean)value);
+            }
+        }
+        return json;
+    }
 
 
     public int CreateDatabase(String dbName){
@@ -155,25 +174,53 @@ public class DBDriver {
      * tableName -> name of the table to query
      * query -> a string with the query
      */
-    public String DBQuery(String tableName, String[] columns, HashMap<String, String> options){
+    public String DBQuery(String tableName, String[] columns, HashMap<String, Object> options){
+        System.out.println(columns + "Columns");
         try{
             Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
             String query = "SELECT ";
-            for (int i = 0; i < columns.length - 1; i++){
-                query += columns[i]+",";
+            if(columns.length > 1){
+                for (int i = 0; i < columns.length - 1; i++){
+                    query += columns[i]+",";
+                }
+                query += columns[columns.length -1] + " FROM " + tableName + "WHERE ";
+            } else {
+                query += columns[0] + " FROM " + tableName;// + "WHERE ";
             }
-            query += columns[columns.length -1] + " FROM " + tableName + "(";
-            List<Map.Entry<String,String>> optionList = new ArrayList<>(options.entrySet());
-            for (int i = 0; i< optionList.size()-1; i++){
-                query += optionList.get(i).getKey() + ",";
+            List<Map.Entry<String,Object>> optionList = new ArrayList<>(options.entrySet());
+            if(optionList.size() >1){
+                for (int i = 0; i< optionList.size()-1; i++){
+                    // query += optionList.get(i).getKey() + " = " + optionList.get(i).getValue() + " AND ";
+                    query += "? = ? AND ";
+                }
+                // query += optionList.get(optionList.size()-1).getKey() + " = " + optionList.get(optionList.size()-1).getValue();
+                query += "? AND ?;";
             }
-            query+= optionList.get(optionList.size()-1).getKey() + ") VALUES (";
-            for (int i = 0; i< optionList.size()-1; i++){
-                query += "?,";
+            System.out.println(query);
+            PreparedStatement prep = c.prepareStatement(query);
+            for (int i = 0; i< optionList.size()-1; i=i+2){
+                prep.setString(i, optionList.get(i).getKey());
+                if(optionList.get(i+1).getValue() instanceof String){
+                    prep.setString(i+1,(String) optionList.get(i+1).getValue());
+                } else if(optionList.get(i+1).getValue() instanceof Integer){
+                    prep.setInt(i+1,(Integer) optionList.get(i+1).getValue());
+                } else {
+                    prep.setBoolean(i+1,(Boolean) optionList.get(i+1).getValue());
+                } 
             }
-            query+= ")";
-            System.out.println("Query -> " + query);
-            return "OK";
+            ResultSet res = prep.executeQuery();
+            JsonObject resp = new JsonObject();
+            JsonArray array = new JsonArray();
+            resp.addProperty("result", "OK");
+            while(res.next()){
+                // System.out.println(res.first());
+                JsonObject json = this.FillJson(res);
+                array.add(json);
+            }
+            resp.add("payload", array);
+            String result = resp.toString();
+            System.out.println(resp);
+            return result;
         } catch (Exception e){
             System.out.println("Error: " + e.getMessage());
             return "Error: " + e.getMessage();

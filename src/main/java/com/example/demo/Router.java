@@ -1,11 +1,11 @@
 package com.example.demo;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.val;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +17,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 public class Router {
     private DBDriver driver;
+
+    private Object ParseString(String arg){
+        if(arg == null || arg.equalsIgnoreCase(null)){
+            return null;
+        } else if (arg.equalsIgnoreCase("true") || arg.equalsIgnoreCase("false")){
+            return Boolean.parseBoolean(arg);
+        }
+        try{
+            return Integer.parseInt(arg);
+        } catch(NumberFormatException e){
+            //No es el tipo de dato buscado
+        }
+        try{
+            return Double.parseDouble(arg);
+        } catch(NumberFormatException e){
+            //No es el tipo de dato buscado
+        }
+        return arg;
+    }
+
     public Router(){
         driver = new DBDriver();
     }
@@ -63,10 +83,26 @@ public class Router {
     }
     
     @GetMapping("/dbquery")
-    public String getMethodName(@RequestParam String tableName, @RequestParam String[] columns, @RequestParam (required = false) HashMap<String, String> options) {
-      
-        driver.DBQuery(tableName, columns, options);
-        return new String();
+    public String getMethodName(@RequestParam String tableName, @RequestParam (required = false) String[] columns, @RequestParam (required = false) HashMap<String, String> options) {
+        if(columns == null || columns.length == 0){
+            columns = new String[]{"*"}; 
+        }
+        if(options == null || options.isEmpty()){
+            options = new HashMap<>();
+        }
+        HashMap<String, Object> newMap = new HashMap<>();
+        if(options != null){
+            for (Map.Entry<String,String> entry : options.entrySet()){
+                // String key = entry.getKey();
+                // Object val = ParseString(entry.getValue());
+                newMap.put(entry.getKey(), ParseString(entry.getValue()));
+            }
+            System.out.println(newMap);
+        }
+        System.out.println(columns);
+        String result = driver.DBQuery(tableName, columns, newMap);
+        return result;
+       
     }
     
 

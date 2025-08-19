@@ -77,8 +77,9 @@ public class Router {
         return "OK";
     }
 
-    @PutMapping("/InsertData")
+    @PutMapping("/insertdata")
     public String InsertData(@RequestBody String body){
+        driver.DbInsert(body);
         return "Ok";
     }
     
@@ -103,8 +104,9 @@ public class Router {
         System.out.println(options);
         String result = driver.DBQuery(tableName, columns, newMap);
         return result;
-       
     }
+
+
     
 
 }

@@ -113,10 +113,11 @@ public class DBDriver {
      * Insert data on a table
      * @param data: is a JsonObject that contains the information
      * it is constructed as next.
-     * "table":"table name", "values":[{"column":"entry"}]
+     * "table":"table name", "fields":[{"column":"entry"}]
      */
-    public int DbInsert(JsonObject data){
+    public int DbInsert(String body){
         try{
+            JsonObject data = JsonParser.parseString(body).getAsJsonObject();
             Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
             //construccion de la query, inicio
             String query = "INSERT INTO "+data.get("table").getAsString()+"(";
@@ -182,14 +183,12 @@ public class DBDriver {
             String query = "SELECT ";
             query += String.join(",", columns) + " FROM " + tableName;
             List<Map.Entry<String,Object>> optionList = new ArrayList<>(options.entrySet());
-             StringJoiner sj = new StringJoiner(" = ? AND",
+            StringJoiner sj = new StringJoiner(" = ? AND",
                 (optionList.size() > 0)? " WHERE ": "",
                 " = ?");
             for (int i = 0; i< optionList.size(); i++){
-                // query += optionList.get(i).getKey() + " = " + optionList.get(i).getValue() + " AND ";
                 sj.add(optionList.get(i).getKey());
             }
-                // query += optionList.get(optionList.size()-1).getKey() + " = " + optionList.get(optionList.size()-1).getValue();
             query += sj.toString();
             System.out.println(query);
             PreparedStatement prep = c.prepareStatement(query);
@@ -215,10 +214,16 @@ public class DBDriver {
             resp.add("payload", array);
             String result = resp.toString();
             System.out.println(resp);
+            c.close();
             return result;
         } catch (Exception e){
             System.out.println("Error: " + e.getMessage());
             return "Error: " + e.getMessage();
         }
+    }
+
+    public String UpdateTable(String body){
+
+        return "OK";
     }
 }

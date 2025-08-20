@@ -6,6 +6,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,32 +123,27 @@ public class DBDriver {
         try{
             JsonObject data = JsonParser.parseString(body).getAsJsonObject();
             Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
-            //construccion de la query, inicio
-            String query = "INSERT INTO "+data.get("table").getAsString()+"(";
             //obtension de las claves
             JsonArray fields = data.get("fields").getAsJsonArray();
             JsonObject first = data.get("fields").getAsJsonArray().get(0).getAsJsonObject();
             List<String> keys = new ArrayList<>(first.keySet());
-            for (int i = 0; i< keys.size() -1; i++){
-                query += keys.get(i) + ',';
-            }
-            query += keys.get(keys.size()-1) + ") VALUES (";
-            //obtener cantidad de insersiones
-            int size = data.get("fields").getAsJsonArray().size();
-            // obtener cantidad de insersiones
+            String colNames = String.join(",", keys);
+            //Construccion de la query
+            StringBuilder query = new StringBuilder("INSERT INTO ")
+            .append(data.get("table").getAsString())
+            .append("(")
+            .append(colNames)
+            .append(") VALUES ");
+            System.out.println(query.toString());
+            //cantidad de jsons en el JsonArray (filas a insertar)
+            int rows = data.get("fields").getAsJsonArray().size();
+            // cantidad de insersiones (columnas a insertar por cada fila)
             int cols = fields.get(0).getAsJsonObject().size();
-            System.out.println(cols);
-            for(int i = 0; i< size; i++){
-                for (int j = 0; j< cols-1; j++){
-                    query += "?, ";
-                }
-                // query += "?)";
-                query = (i != size-1)? query+ "?),(" : query + "?);";
-            }
-            /* here, I use 3 different index, i for match columns and JSONs numbers
-               j for walk through JSON keys and k for walk through array's JSONs.
-            */
-            PreparedStatement prep = c.prepareStatement(query);
+            String colsPlaceHolder = "(" + String.join(",", Collections.nCopies(cols, "?")) +")";
+            String rowsPlaceHolder = String.join(",",Collections.nCopies(rows,colsPlaceHolder));
+            query.append(rowsPlaceHolder);
+            System.out.println(query.toString());
+            PreparedStatement prep = c.prepareStatement(query.toString());
             int paramIndex = 1;
             for (JsonElement field : fields){
                 for (String key : keys){
@@ -161,21 +158,6 @@ public class DBDriver {
                     paramIndex++;
                 }
             }
-            // int k = 0;
-            // for(int i = 0; i< size+cols;i+=cols){
-            //     for(int j = 0; j< cols; j++){
-            //         System.out.println(""+i + j + k);
-            //         System.out.println(keys.get(j));
-            //         if(fields.get(k).getAsJsonObject().get(keys.get(j)).getAsJsonPrimitive().isString()){ 
-            //             prep.setString(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsString());
-            //          } else if (fields.get(k).getAsJsonObject().get(keys.get(j)).getAsJsonPrimitive().isNumber()){ 
-            //             prep.setInt(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsInt());
-            //          } else{
-            //              prep.setBoolean(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsBoolean());
-            //          }
-            //     }
-            //     k++;
-            // }
             System.out.println(prep);
             prep.executeUpdate();
             c.close();

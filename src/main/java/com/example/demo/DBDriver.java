@@ -112,14 +112,13 @@ public class DBDriver {
             return 1;
         }
     }
-
-    /*
-     * Insert data on a table
-     * @param data: is a JsonObject that contains the information
-     * it is constructed as next.
-     * "table":"table name", "fields":[{"column":"entry"}]
+    /**
+     * 
+     * @param body: is a JsonObject that contains the information
+     * it is constructed as next. "table":"table name", "fields":[{"column":"entry"}]
+     * @return
      */
-    public int DbInsert(String body){
+    public String DbInsert(String body){
         try{
             JsonObject data = JsonParser.parseString(body).getAsJsonObject();
             Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
@@ -161,11 +160,30 @@ public class DBDriver {
             System.out.println(prep);
             prep.executeUpdate();
             c.close();
-            return 0;
+            return "OK";
         } catch (Exception e){
             System.out.println("Error: "+e.getMessage());
-            return 1;
+            return e.getMessage();
         }
+    }
+
+
+    public String DBUpdate(String body){
+         try{
+            JsonObject data = JsonParser.parseString(body).getAsJsonObject();
+            Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
+            List<String> keys = new ArrayList<>(data.get("fields").getAsJsonArray().get(0).getAsJsonObject().keySet());
+            String colNames = String.join("= ?,", keys);
+            //Construccion de la query
+            StringBuilder query = new StringBuilder("UPDATE ")
+            .append(data.get("table").getAsString())
+            .append(" Set ")
+            .append(colNames);
+            System.out.println(query.toString());
+        } catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
+        }
+        return "OK";
     }
 
     /**
@@ -221,8 +239,12 @@ public class DBDriver {
         }
     }
 
-    public String UpdateTable(String body){
+    /**
+     * 
+     * @param body: is a json that contains the tableName, the columns to update
+     * {"tableName":"val", fields:["column":"newVal"],conditions:[{"column","val"}]}
+     * @return
+     */
 
-        return "OK";
-    }
+  
 }

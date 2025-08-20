@@ -77,11 +77,6 @@ public class Router {
         return "OK";
     }
 
-    @PutMapping("/insertdata")
-    public String InsertData(@RequestBody String body){
-        driver.DbInsert(body);
-        return "Ok";
-    }
     
     @GetMapping("/dbquery")
     public String getMethodName(@RequestParam String tableName, @RequestParam (required = false) String[] columns, @RequestParam (required = false) HashMap<String, String> options) {
@@ -106,7 +101,17 @@ public class Router {
         return result;
     }
 
-
     
+    @PostMapping("/insertdata")
+    public String InsertData(@RequestBody String body){
+        driver.DbInsert(body);
+        return "Ok";
+    }
+    
+    @PutMapping("/updatedata")
+    public String UpdateData(@RequestBody String body){
+        driver.DBUpdate(body);
+        return "OK";
+    }
 
 }

@@ -10,13 +10,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+
+
 import java.sql.PreparedStatement;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-
+import com.google.gson.JsonPrimitive;
 import com.google.gson.Gson;
 
 // import javax.sql.*;
@@ -145,21 +147,35 @@ public class DBDriver {
                j for walk through JSON keys and k for walk through array's JSONs.
             */
             PreparedStatement prep = c.prepareStatement(query);
-            int k = 0;
-            for(int i = 0; i< size+cols;i+=cols){
-                for(int j = 0; j< cols; j++){
-                    System.out.println(""+i + j + k);
-                    System.out.println(keys.get(j));
-                    if(fields.get(k).getAsJsonObject().get(keys.get(j)).getAsJsonPrimitive().isString()){ 
-                        prep.setString(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsString());
-                     } else if (fields.get(k).getAsJsonObject().get(keys.get(j)).getAsJsonPrimitive().isNumber()){ 
-                        prep.setInt(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsInt());
-                     } else{
-                         prep.setBoolean(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsBoolean());
-                     }
+            int paramIndex = 1;
+            for (JsonElement field : fields){
+                for (String key : keys){
+                    JsonPrimitive value = field.getAsJsonObject().getAsJsonPrimitive(key);
+                    if(value.isString()){
+                        prep.setString(paramIndex, value.getAsString());
+                    } else if (value.isNumber()){
+                        prep.setInt(paramIndex, value.getAsInt());
+                    } else {
+                        prep.setBoolean(paramIndex, value.getAsBoolean());
+                    }
+                    paramIndex++;
                 }
-                k++;
             }
+            // int k = 0;
+            // for(int i = 0; i< size+cols;i+=cols){
+            //     for(int j = 0; j< cols; j++){
+            //         System.out.println(""+i + j + k);
+            //         System.out.println(keys.get(j));
+            //         if(fields.get(k).getAsJsonObject().get(keys.get(j)).getAsJsonPrimitive().isString()){ 
+            //             prep.setString(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsString());
+            //          } else if (fields.get(k).getAsJsonObject().get(keys.get(j)).getAsJsonPrimitive().isNumber()){ 
+            //             prep.setInt(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsInt());
+            //          } else{
+            //              prep.setBoolean(i+j+1, fields.get(k).getAsJsonObject().get(keys.get(j)).getAsBoolean());
+            //          }
+            //     }
+            //     k++;
+            // }
             System.out.println(prep);
             prep.executeUpdate();
             c.close();
@@ -183,9 +199,10 @@ public class DBDriver {
             String query = "SELECT ";
             query += String.join(",", columns) + " FROM " + tableName;
             List<Map.Entry<String,Object>> optionList = new ArrayList<>(options.entrySet());
-            StringJoiner sj = new StringJoiner(" = ? AND",
+            StringJoiner sj = new StringJoiner(
+                (optionList.size() > 0)?" = ? AND" : "",
                 (optionList.size() > 0)? " WHERE ": "",
-                " = ?");
+                (optionList.size() > 0)?" = ?" : "");
             for (int i = 0; i< optionList.size(); i++){
                 sj.add(optionList.get(i).getKey());
             }

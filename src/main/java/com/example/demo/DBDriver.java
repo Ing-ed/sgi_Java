@@ -171,15 +171,55 @@ public class DBDriver {
     public String DBUpdate(String body){
          try{
             JsonObject data = JsonParser.parseString(body).getAsJsonObject();
+            System.out.println(data + "dataJson");
             Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
             List<String> keys = new ArrayList<>(data.get("fields").getAsJsonArray().get(0).getAsJsonObject().keySet());
-            String colNames = String.join("= ?,", keys);
+            String colNames = String.join("= ?,", keys) +" = ?"; // columnas que se van a actualizar
             //Construccion de la query
             StringBuilder query = new StringBuilder("UPDATE ")
             .append(data.get("table").getAsString())
             .append(" Set ")
             .append(colNames);
+            
+            List<String> conds = new ArrayList<>(data.get("conditions").getAsJsonArray().get(0).getAsJsonObject().keySet());
+            String condNames = String.join("= ? AND ", conds) +" = ?"; //condiciones para acutalizar
+
+            query.append(" WHERE ")
+             .append(condNames)
+             .append(";");
             System.out.println(query.toString());
+            PreparedStatement prep = c.prepareStatement(query.toString());
+            JsonArray fields = data.get("fields").getAsJsonArray();
+            JsonArray conditions = data.get("conditions").getAsJsonArray();
+            int paramIndex = 1;
+            for (JsonElement field : fields){
+                for (String key : keys){
+                    JsonPrimitive value = field.getAsJsonObject().getAsJsonPrimitive(key);
+                    if(value.isString()){
+                        prep.setString(paramIndex, value.getAsString());
+                    } else if (value.isNumber()){
+                        prep.setInt(paramIndex, value.getAsInt());
+                    } else {
+                        prep.setBoolean(paramIndex, value.getAsBoolean());
+                    }
+                    paramIndex++;
+                }
+            }
+            for (JsonElement condition : conditions){
+                for (String cond : conds){
+                    JsonPrimitive value = condition.getAsJsonObject().getAsJsonPrimitive(cond);
+                    if(value.isString()){
+                        prep.setString(paramIndex, value.getAsString());
+                    } else if (value.isNumber()){
+                        prep.setInt(paramIndex, value.getAsInt());
+                    } else {
+                        prep.setBoolean(paramIndex, value.getAsBoolean());
+                    }
+                    paramIndex++;
+                }
+            }
+            System.out.println(prep + "Prep");
+            prep.executeUpdate();
         } catch (Exception e){
             System.out.println("Error: " + e.getMessage());
         }

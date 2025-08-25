@@ -3,6 +3,7 @@ package com.example.demo;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -111,6 +112,12 @@ public class Router {
     @PutMapping("/updatedata")
     public String UpdateData(@RequestBody String body){
         driver.DBUpdate(body);
+        return "OK";
+    }
+
+    @DeleteMapping("/deletedata")
+    public String DeleteData(@RequestBody String body){
+        driver.DBDelete(body);
         return "OK";
     }
 

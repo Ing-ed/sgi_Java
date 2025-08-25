@@ -167,6 +167,12 @@ public class DBDriver {
         }
     }
 
+    /**
+     * 
+     * @param body: is a json that contains the tableName, the columns to update
+     * {"tableName":"val", fields:["column":"newVal"],conditions:[{"column","val"}]}
+     * @return
+     */
 
     public String DBUpdate(String body){
          try{
@@ -220,6 +226,7 @@ public class DBDriver {
             }
             System.out.println(prep + "Prep");
             prep.executeUpdate();
+            c.close();
         } catch (Exception e){
             System.out.println("Error: " + e.getMessage());
         }
@@ -279,12 +286,48 @@ public class DBDriver {
         }
     }
 
-    /**
-     * 
-     * @param body: is a json that contains the tableName, the columns to update
-     * {"tableName":"val", fields:["column":"newVal"],conditions:[{"column","val"}]}
-     * @return
-     */
+    public String DBDelete(String body){
+        try{
+            JsonObject data = JsonParser.parseString(body).getAsJsonObject();
+            System.out.println(data + "dataJson");
+            Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
+            List<String> conds = new ArrayList<>(data.get("conditions").getAsJsonArray().get(0).getAsJsonObject().keySet());
+            String condNames = String.join("= ? AND ", conds) +" = ?"; //condiciones para acutalizar
+ // columnas que se van a actualizar
+            //Construccion de la query
+            StringBuilder query = new StringBuilder("DELETE FROM ")
+            .append(data.get("table").getAsString())
+            .append(" WHERE ")
+            .append(condNames)
+            .append(";");
+            System.out.println(query +  "Query");
+            PreparedStatement prep = c.prepareStatement(query.toString());
+            JsonArray conditions = data.get("conditions").getAsJsonArray();
+            int paramIndex = 1;
+            for (JsonElement condition : conditions){
+                for (String cond : conds){
+                    JsonPrimitive value = condition.getAsJsonObject().getAsJsonPrimitive(cond);
+                    if(value.isString()){
+                        prep.setString(paramIndex, value.getAsString());
+                    } else if (value.isNumber()){
+                        prep.setInt(paramIndex, value.getAsInt());
+                    } else {
+                        prep.setBoolean(paramIndex, value.getAsBoolean());
+                    }
+                    paramIndex++;
+                }
+            }
+            System.out.println(prep);
+            prep.executeUpdate();
+            c.close();
+        } catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
+            return "Error: " + e.getMessage();
+        }
+        return "OK";
+    }
+
+    
 
   
 }

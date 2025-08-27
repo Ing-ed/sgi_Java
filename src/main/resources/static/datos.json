@@ -1,0 +1,191 @@
+{
+    "personaReturn": {
+        "datosGenerales": {
+            "caracterizacion": [
+                {
+                    "descripcionCaracterizacion": "CUENTA CORRIENTE",
+                    "idCaracterizacion": 82,
+                    "periodo": 20071201
+                }
+            ],
+            "domicilioFiscal": {
+                "codPostal": "1086",
+                "descripcionProvincia": "CIUDAD AUTONOMA BUENOS AIRES",
+                "direccion": "YRIGOYEN HIPOLITO 201 Piso:9 Dpto:5297",
+                "idProvincia": 0,
+                "tipoDomicilio": "FISCAL"
+            },
+            "esSucesion": "NO",
+            "estadoClave": "ACTIVO",
+            "fechaContratoSocial": "1997-07-14T15:00:00.000Z",
+            "idPersona": 33693450239,
+            "mesCierre": 12,
+            "razonSocial": "AGENCIA DE RECAUDACION Y CONTROL ADUANERO",
+            "tipoClave": "CUIT",
+            "tipoPersona": "JURIDICA"
+        },
+        "datosRegimenGeneral": {
+            "actividad": [
+                {
+                    "descripcionActividad": "SERVICIOS INDUSTRIALES PARA LA INDUSTRIA CONFECCIONISTA",
+                    "idActividad": 149000,
+                    "nomenclador": 883,
+                    "orden": 2,
+                    "periodo": 202212
+                },
+                {
+                    "descripcionActividad": "SERVICIOS GENERALES DE LA ADMINISTRACIÓN PÚBLICA",
+                    "idActividad": 841100,
+                    "nomenclador": 883,
+                    "orden": 1,
+                    "periodo": 201311
+                }
+            ],
+            "impuesto": [
+                {
+                    "descripcionImpuesto": "IVA",
+                    "estadoImpuesto": "AC",
+                    "idImpuesto": 30,
+                    "motivo": "INSCRIPCIÓN TRAMITADA EN AGENCIA",
+                    "periodo": 202006
+                }
+            ],
+            "regimen": [
+                {
+                    "descripcionRegimen": "INTERESES POR OTRO TIPO DE OPERACIONES",
+                    "idImpuesto": 217,
+                    "idRegimen": 21,
+                    "periodo": 200004,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "ALQUILERES O ARRENDAMIENTOS DE BIENES MUEBLES",
+                    "idImpuesto": 217,
+                    "idRegimen": 30,
+                    "periodo": 200908,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "BIENES INMUEBLES URBANOS INCLUÍDOS LOS EFECTUADOS BAJO MODALIDAD DE LEASING-INCLUYE SUBURBANOS.",
+                    "idImpuesto": 217,
+                    "idRegimen": 31,
+                    "periodo": 200908,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "ENAJENACION DE BIENES MUEBLES Y BIENES DE CAMBIO",
+                    "idImpuesto": 217,
+                    "idRegimen": 78,
+                    "periodo": 200001,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "REG.RET.A LAS GANANCIAS - LOCACIONES DE OBRAS Y/O SERVICIOS, NO EJECUTADOS EN RELACION DE DEPENDENCIA, QUE NO SE ENCUENTREN TAXATIVAMENTE MENCIONADOS EN LOS INCISOS I Y J.",
+                    "idImpuesto": 217,
+                    "idRegimen": 94,
+                    "periodo": 200001,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "HONORARIOS DE DIRECTOR DE S.A., FIDUCIARIO, INTEGRANTE DE CONSEJOS DE VIGILANCIA Y SOCIOS ADMINISTRADORES DE S.R.L., EN COMANDITA SIMPLE Y POR ACCIONES, ALBACEA, SINDICO, MANDATARIO, GESTOR DE NEGOCIO.",
+                    "idImpuesto": 217,
+                    "idRegimen": 116,
+                    "periodo": 200001,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "GANANCIAS - RÉGIMEN DE RETENCIÓN A SUJETOS ADHERIDOS AL RÉGIMEN SIMPLIFICADO PARA PEQUEÑOS CONTRIBUYENTES.",
+                    "idImpuesto": 217,
+                    "idRegimen": 775,
+                    "periodo": 200909,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "idImpuesto": 218,
+                    "idRegimen": 169,
+                    "periodo": 201304
+                },
+                {
+                    "descripcionRegimen": "ALQUILERES O ARRENDAMIENTOS DE INMUEBLES UBICADOS EN EL PAIS DE PROPIEDAD DE SUJETOS DEL EXTERIOR",
+                    "idImpuesto": 218,
+                    "idRegimen": 822,
+                    "periodo": 201503,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "EMPRESAS CONSTRUCTORAS",
+                    "idImpuesto": 353,
+                    "idRegimen": 740,
+                    "periodo": 200001,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "EMPRESAS DE SERVICIOS EVENTUALES",
+                    "idImpuesto": 353,
+                    "idRegimen": 742,
+                    "periodo": 200605,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "RETENCIÓN DE PRESTADORES DE SERVICIOS DE LIMPIEZA DE INMUEBLES",
+                    "idImpuesto": 353,
+                    "idRegimen": 748,
+                    "periodo": 200310,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "RETENCION CONTRIBUCIONES PATRONALES PRESTACION SERVICIOS DE INVESTIGACIÓN Y SEGURIDAD",
+                    "idImpuesto": 353,
+                    "idRegimen": 754,
+                    "periodo": 200411,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "SICORE-REG.RET.PREMIOS DE DETERMINADOS JUEGOS Y CONCURSOS DEPORTIVOS.",
+                    "idImpuesto": 466,
+                    "idRegimen": 434,
+                    "periodo": 200902,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "PAGO DE HONORARIOS PROFESIONALES",
+                    "idImpuesto": 767,
+                    "idRegimen": 280,
+                    "periodo": 199707,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "EMP PROV. DE GAS, ELECTRICIDAD O TELECOMUNICACIONES - ART. 3° INC 1",
+                    "idImpuesto": 767,
+                    "idRegimen": 299,
+                    "periodo": 199707,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "IVA -RÉGIMEN DE RETENCIÓN A SUJETOS ADHERIDOS AL RÉGIMEN SIMPLIFICADO PARA PEQUEÑOS CONTRIBUYENTES.",
+                    "idImpuesto": 767,
+                    "idRegimen": 777,
+                    "periodo": 200909,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "RENTAS DEL TRABAJO PERSONAL BAJO RELACIÓN DE DEPENDENCIA Y OTROS",
+                    "idImpuesto": 787,
+                    "idRegimen": 160,
+                    "periodo": 201502,
+                    "tipoRegimen": "RETENCION"
+                },
+                {
+                    "descripcionRegimen": "PARTICIPACIONES SOCIETARIAS",
+                    "idImpuesto": 103,
+                    "idRegimen": 68,
+                    "periodo": 20131101
+                }
+            ]
+        },
+        "metadata": {
+            "fechaHora": "2025-08-26T16:58:09.265Z",
+            "servidor": "setiwsh2"
+        }
+    }
+}

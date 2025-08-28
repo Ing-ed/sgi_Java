@@ -6,6 +6,16 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 
+/**
+ * datos necesarios:
+ * razon social
+ * cuit
+ * actividades (codigo)
+ * codigo postal
+ * jurisdiccion
+ * responsabilidad frente al iva
+ */
+
 public class UI {
     FetchDriver driver;// = new FetchDriver("20409378472")
     private void Open(Component parent, JTextField file){

@@ -21,7 +21,6 @@ public class FetchDriver {
     private String cuit;
     private Map<String,Object> reqStructure;
     private Map<String,String> params;
-    private Map<String, Object> reqPayload;
     public FetchDriver(){
         http = HttpClient.newHttpClient();
     }
@@ -35,7 +34,6 @@ public class FetchDriver {
         //params
         
         //inicializar reqPayload
-        reqPayload = new HashMap<>();
         this.cuit = cuit;
     }
     public String Authenticate(){
@@ -74,7 +72,7 @@ public class FetchDriver {
             return ("Error");
         }
     }
-    public String QueryCuit(String cuits){
+    public String QueryCuit(String cuit){
         // String[] resps ={""};
         // for (String cuit : cuits){
         params.remove("idPersona");
@@ -82,7 +80,9 @@ public class FetchDriver {
         reqStructure.remove("params");
         reqStructure.put("params", params);
         // }
-        // System.out.println(reqStructure.toString());
+        System.out.println("Request");
+        System.out.println(reqStructure.toString());
+        System.out.println("FinRequest");
         Gson gson = new Gson();
         String requestBody = gson.toJson(reqStructure);
         String res = this.Fetch("requests", requestBody);

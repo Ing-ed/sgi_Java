@@ -189,3 +189,21 @@
         }
     }
 }
+
+{
+    "personaReturn": {
+        "errorConstancia": {
+            "apellido": "PEREZ",
+            "error": [
+                "La CUIT no registra domicilio fiscal declarado, o el mismo se encuentra incompleto o incorrecto.",
+                "La CUIT registra pendiente la constitución del domicilio fiscal electrónico de acuerdo a lo normado en la RG 4280/18 AFIP."
+            ],
+            "idPersona": 20123456789,
+            "nombre": "EZEQUIEL RICARDO"
+        },
+        "metadata": {
+            "fechaHora": "2025-08-31T17:06:55.598Z",
+            "servidor": "setiwsh2"
+        }
+    }
+}

@@ -32,18 +32,45 @@ public class UI {
         open.setAlignmentX(Component.CENTER_ALIGNMENT);
         open.addActionListener(e -> arca.Open(panel,openFile));
 
+        JPanel viewPanel = new JPanel();
+        viewPanel.setLayout(new BoxLayout(viewPanel, BoxLayout.X_AXIS));
+
         JTextArea viewData = new JTextArea();
         viewData.setMaximumSize(new Dimension(300,500));
-        viewData.setAlignmentX(Component.CENTER_ALIGNMENT);
+        viewData.setEditable(false);
+        viewData.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        JScrollPane scrollPanel = new JScrollPane(viewData);
+        scrollPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JPanel navPanel = new JPanel();
+        navPanel.setLayout(new BoxLayout(navPanel,BoxLayout.Y_AXIS));
+        navPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton prev = new JButton("Prev");
+        prev.setPreferredSize(new Dimension(70,30));
+        prev.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        JButton next = new JButton("Next");
+        next.setPreferredSize(new Dimension(70,30));
+        next.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        navPanel.add(prev);
+        navPanel.add(next);
+
+        viewPanel.add(scrollPanel);
+        viewPanel.add(navPanel);
 
         JTextField saveFile = new JTextField();
         saveFile.setMaximumSize(new Dimension(200,30));
         saveFile.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+
+
         JButton send = new JButton("Guardar");
         send.setPreferredSize(new Dimension(70,30));
         send.setAlignmentX(Component.CENTER_ALIGNMENT);
-        send.addActionListener(e -> arca.GetCuit(openFile.getText()));
+        send.addActionListener(e -> arca.GetCuit(openFile.getText(),viewData));
         panel.setBorder(new EmptyBorder(20,0,20,0));
 
 
@@ -52,7 +79,7 @@ public class UI {
         panel.add(Box.createRigidArea(new Dimension(20,5)));
         panel.add(open);
         // panel.add(Box.createVerticalGlue());
-        panel.add(viewData);
+        panel.add(viewPanel);
         panel.add(saveFile);
         panel.add(send);
         frame.add(panel);

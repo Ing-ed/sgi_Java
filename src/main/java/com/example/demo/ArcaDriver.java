@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFileChooser;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -118,7 +121,7 @@ public class ArcaDriver {
             System.out.println("Error: " + e.getMessage());
         }
     }
-    public String GetCuit(String fileName){
+    public String GetCuit(String fileName, JTextArea viewData){
         try{
             // File file = new File(fileName.toString());
             FileReader fileReader = new FileReader(fileName);
@@ -137,6 +140,11 @@ public class ArcaDriver {
                 SaveData(res);
                 outData.add(res);
             }
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonObject viewObject = JsonParser.parseString(outData.get(0)).getAsJsonObject();
+
+
+            viewData.setText(gson.toJson(viewObject));
             // System.out.println("salida\n");
             // System.out.println(outData.toString());
 

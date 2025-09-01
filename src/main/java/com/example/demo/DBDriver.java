@@ -6,7 +6,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,11 +28,8 @@ public class DBDriver {
     final private String url = "jdbc:mysql://localhost";
     final private String usr = "root";
     final private String pswd = "bujinkanbud0";
-    private String dbName = "";
 
-    public DBDriver(String dbName){
-        this.dbName = dbName;
-    }
+  
     public DBDriver(){
         
     }

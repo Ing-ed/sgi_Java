@@ -1,13 +1,13 @@
 package com.example.demo;
 
+
+import java.awt.Component;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
-
-import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -105,7 +105,7 @@ public class ArcaDriver {
             System.out.println(e.getMessage());
         }
     }
-    private void Open(Component parent, JTextField file){
+    public void Open(Component parent, JTextField file){
         try{
             JFileChooser fileChooser = new JFileChooser();
             int fileName = fileChooser.showOpenDialog(parent);
@@ -118,7 +118,7 @@ public class ArcaDriver {
             System.out.println("Error: " + e.getMessage());
         }
     }
-    private String GetCuit(String fileName){
+    public String GetCuit(String fileName){
         try{
             // File file = new File(fileName.toString());
             FileReader fileReader = new FileReader(fileName);
@@ -137,8 +137,8 @@ public class ArcaDriver {
                 SaveData(res);
                 outData.add(res);
             }
-            System.out.println("salida\n");
-            System.out.println(outData.toString());
+            // System.out.println("salida\n");
+            // System.out.println(outData.toString());
 
             return "OK";
         } catch (Exception e){

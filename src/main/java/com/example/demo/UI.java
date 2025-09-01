@@ -3,16 +3,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileReader;
-import java.util.List;
-import java.util.ArrayList;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 /**
  * datos necesarios:
  * razon social
@@ -24,136 +15,8 @@ import com.google.gson.JsonElement;
  */
 
 public class UI {
-    FetchDriver driver;// = new FetchDriver("20409378472")
-    private List<String> outData;
-    private String OkConstancia(JsonObject persona){
-        JsonObject datosGenerales = persona.get("datosGenerales").
-        getAsJsonObject();
-        JsonObject datosRegimenGral = persona.get("datosRegimenGeneral").
-        getAsJsonObject();
-        JsonObject domicilioFiscal = datosGenerales.get("domicilioFiscal").getAsJsonObject();
-        // separar actividades y cond- IVA
-        JsonArray actividades = datosRegimenGral.get("actividad").getAsJsonArray();
-        JsonObject impuesto = datosRegimenGral.get("impuesto").getAsJsonArray().get(0).getAsJsonObject();
-        //Obtener los datos
-        String razonSocial = datosGenerales.get("razonSocial").getAsString();
-        long cuit = datosGenerales.get("idPersona").getAsLong();
-        String codigoPostal = domicilioFiscal.get("codPostal").getAsString();
-        String descripcionProvincia = domicilioFiscal.get("descripcionProvincia").getAsString(); //jurisdiccion
-        String descripcionImpuesto = impuesto.get("descripcionImpuesto").getAsString();
-        List<String> codigos = new ArrayList<String>();
-        for(JsonElement actividad : actividades){
-            codigos.add(
-                actividad.getAsJsonObject()
-                .get("idActividad")
-                .getAsString()
-            );
-        }
-        String idActividades = String.join(",-", codigos);
-        System.out.println("datos obtenidos\n");
-        StringBuilder sb = new StringBuilder("Datos ")
-        // .append(" razonSocial: ")
-        .append(razonSocial)
-        .append(" -")
-        .append(cuit)
-        .append(" -")
-        .append(descripcionImpuesto)
-        .append(" -")
-        .append(descripcionProvincia)
-        .append(" -")
-        .append(codigoPostal)
-        .append(" - ")
-        .append(idActividades)
-        .append(" - ");
-
-        return (sb.toString());
-    }
-    private String ErrorConstancia(JsonObject persona){
-        JsonObject errorConstancia = persona.get("errorConstancia").
-        getAsJsonObject();
-        long cuit = errorConstancia.get("idPersona").getAsLong();
-        String error = errorConstancia.get("error").getAsJsonArray()
-        .get(0).getAsString();
-        StringBuilder sb = new StringBuilder("Datos ")
-        // .append(" razonSocial: ")
-        .append("null")
-        .append(" -")
-        .append(cuit)
-        .append(" -")
-        .append("null")
-        .append(" -")
-        .append("null")
-        .append(" -")
-        .append("null")
-        .append(" - ")
-        .append("null")
-        .append(" - ")
-        .append(error);
-        return (sb.toString());
-    }
-    private void SaveData(String resp){
-        try{
-            //Separar los campos de interes
-            String datosFiltrados = "";
-            JsonObject persona = JsonParser.parseString(resp).getAsJsonObject()
-            .get("personaReturn").getAsJsonObject();
-            if(persona.get("errorConstancia") != null){
-                datosFiltrados = ErrorConstancia(persona);
-            } else {
-                datosFiltrados = OkConstancia(persona);
-            }
-           
-            // .append(")");
-            System.out.println(datosFiltrados);
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-    }
-    private void Open(Component parent, JTextField file){
-        try{
-            JFileChooser fileChooser = new JFileChooser();
-            int fileName = fileChooser.showOpenDialog(parent);
-            System.out.println(fileName);
-            if(fileName == 0){
-                System.out.println(fileChooser.getSelectedFile());
-                file.setText(fileChooser.getSelectedFile().toString());
-            }
-        } catch (Exception e){
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-    private String GetCuit(String fileName){
-        try{
-            // File file = new File(fileName.toString());
-            FileReader fileReader = new FileReader(fileName);
-            int i, j = 0;
-            String buffer = "";
-            while ((i = fileReader.read()) != -1) {
-                buffer += (char)i;
-            }
-            // System.out.println(buffer);
-            String[] cuits = buffer.split("\n");
-            // System.out.println(cuits);
-            for(String cuit : cuits){
-                String res = driver.QueryCuit(cuit);
-                System.out.println(cuit);
-
-                SaveData(res);
-                outData.add(res);
-            }
-            System.out.println("salida\n");
-            System.out.println(outData.toString());
-
-            return "OK";
-        } catch (Exception e){
-            System.out.println("Error: " + e.getMessage());
-            return "Error";
-        }
-    }
+    private ArcaDriver arca = new ArcaDriver();
     public UI(){
-        driver = new FetchDriver("20409378472");
-        outData = new ArrayList<String>();
-        driver.Authenticate();
         JFrame frame = new JFrame("Hola mundo");
         frame.setSize(400,700);
         JPanel panel = new JPanel();
@@ -167,7 +30,7 @@ public class UI {
         JButton open = new JButton("Abrir");
         open.setPreferredSize(new Dimension(70,30));
         open.setAlignmentX(Component.CENTER_ALIGNMENT);
-        open.addActionListener(e -> this.Open(panel,openFile));
+        open.addActionListener(e -> arca.Open(panel,openFile));
 
         JTextArea viewData = new JTextArea();
         viewData.setMaximumSize(new Dimension(300,500));
@@ -180,7 +43,7 @@ public class UI {
         JButton send = new JButton("Guardar");
         send.setPreferredSize(new Dimension(70,30));
         send.setAlignmentX(Component.CENTER_ALIGNMENT);
-        send.addActionListener(e -> GetCuit(openFile.getText()));
+        send.addActionListener(e -> arca.GetCuit(openFile.getText()));
         panel.setBorder(new EmptyBorder(20,0,20,0));
 
 

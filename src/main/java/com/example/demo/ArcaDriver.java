@@ -3,6 +3,7 @@ package com.example.demo;
 
 import java.awt.Component;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +21,15 @@ import com.google.gson.JsonParser;
 public class ArcaDriver {
     private FetchDriver driver;// = new FetchDriver("20409378472")
     private List<String> outData;
+    private int index;
     public ArcaDriver(){
         driver = new FetchDriver("20409378472");
         outData = new ArrayList<String>();
+        index = 0;
         driver.Authenticate();
     }
-      private String OkConstancia(JsonObject persona){
+    
+    private String OkConstancia(JsonObject persona){
         JsonObject datosGenerales = persona.get("datosGenerales").
         getAsJsonObject();
         JsonObject datosRegimenGral = persona.get("datosRegimenGeneral").
@@ -90,25 +94,39 @@ public class ArcaDriver {
         .append(error);
         return (sb.toString());
     }
-    private void SaveData(String resp){
+    public void SaveData(Component parent){
         try{
             //Separar los campos de interes
-            String datosFiltrados = "";
-            JsonObject persona = JsonParser.parseString(resp).getAsJsonObject()
-            .get("personaReturn").getAsJsonObject();
-            if(persona.get("errorConstancia") != null){
-                datosFiltrados = ErrorConstancia(persona);
-            } else {
-                datosFiltrados = OkConstancia(persona);
+            JFileChooser fileChooser = new JFileChooser();
+            int fileSave = fileChooser.showSaveDialog(parent);
+
+            List<String> datosFiltrados = new ArrayList<String>();
+            for(String data : outData){
+                JsonObject persona = JsonParser.parseString(data).getAsJsonObject()
+                .get("personaReturn").getAsJsonObject();
+                if(persona.get("errorConstancia") != null){
+                    datosFiltrados.add(ErrorConstancia(persona));
+                } else {
+                    datosFiltrados.add(OkConstancia(persona));
+                }
             }
-           
+            
+            if(fileSave == 0){
+                FileWriter file = new FileWriter(fileChooser.getSelectedFile());
+                for(String result : datosFiltrados){
+                    file.write(result);
+                    file.write('\n');
+                }
+                file.close();
+            }
             // .append(")");
             System.out.println(datosFiltrados);
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
     }
-    public void Open(Component parent, JTextField file){
+
+    public void Open(Component parent, JTextField file, JTextArea viewData){
         try{
             JFileChooser fileChooser = new JFileChooser();
             int fileName = fileChooser.showOpenDialog(parent);
@@ -117,11 +135,12 @@ public class ArcaDriver {
                 System.out.println(fileChooser.getSelectedFile());
                 file.setText(fileChooser.getSelectedFile().toString());
             }
+            GetCuit(fileChooser.getSelectedFile().toString(), viewData);
         } catch (Exception e){
             System.out.println("Error: " + e.getMessage());
         }
     }
-    public String GetCuit(String fileName, JTextArea viewData){
+    private void GetCuit(String fileName, JTextArea viewData){
         try{
             // File file = new File(fileName.toString());
             FileReader fileReader = new FileReader(fileName);
@@ -137,7 +156,7 @@ public class ArcaDriver {
                 String res = driver.QueryCuit(cuit);
                 System.out.println(cuit);
 
-                SaveData(res);
+                // SaveData(res);
                 outData.add(res);
             }
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -148,10 +167,21 @@ public class ArcaDriver {
             // System.out.println("salida\n");
             // System.out.println(outData.toString());
 
-            return "OK";
         } catch (Exception e){
             System.out.println("Error: " + e.getMessage());
-            return "Error";
         }
     }
+    public void Next(JTextArea viewData){
+        index = index == outData.size()-1 ? index: index +1;
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonObject viewObject = JsonParser.parseString(outData.get(index)).getAsJsonObject();
+        viewData.setText(gson.toJson(viewObject));
+    }
+    public void Prev(JTextArea viewData){
+        index = index == 0 ? 0: index -1;
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonObject viewObject = JsonParser.parseString(outData.get(index)).getAsJsonObject();
+        viewData.setText(gson.toJson(viewObject));
+    }
 }
+

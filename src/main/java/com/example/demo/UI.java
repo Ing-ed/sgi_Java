@@ -26,19 +26,21 @@ public class UI {
         JTextField openFile = new JTextField();
         openFile.setMaximumSize(new Dimension(200,30));
         openFile.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
+        JTextArea viewData = new JTextArea();
+        viewData.setMaximumSize(new Dimension(50,500));
+        viewData.setEditable(false);
+        viewData.setAlignmentY(Component.CENTER_ALIGNMENT);
+        
         JButton open = new JButton("Abrir");
         open.setPreferredSize(new Dimension(70,30));
         open.setAlignmentX(Component.CENTER_ALIGNMENT);
-        open.addActionListener(e -> arca.Open(panel,openFile));
-
+        open.addActionListener(e -> arca.Open(panel,openFile, viewData));
+        
         JPanel viewPanel = new JPanel();
         viewPanel.setLayout(new BoxLayout(viewPanel, BoxLayout.X_AXIS));
-
-        JTextArea viewData = new JTextArea();
-        viewData.setMaximumSize(new Dimension(300,500));
-        viewData.setEditable(false);
-        viewData.setAlignmentY(Component.CENTER_ALIGNMENT);
+        viewPanel.setBorder(new EmptyBorder(20, 20, 0, 0));
+        
 
         JScrollPane scrollPanel = new JScrollPane(viewData);
         scrollPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -50,10 +52,12 @@ public class UI {
         JButton prev = new JButton("Prev");
         prev.setPreferredSize(new Dimension(70,30));
         prev.setAlignmentY(Component.CENTER_ALIGNMENT);
+        prev.addActionListener(e -> arca.Prev(viewData));
 
         JButton next = new JButton("Next");
         next.setPreferredSize(new Dimension(70,30));
         next.setAlignmentY(Component.CENTER_ALIGNMENT);
+        next.addActionListener(e -> arca.Next(viewData));
 
         navPanel.add(prev);
         navPanel.add(next);
@@ -64,13 +68,13 @@ public class UI {
         JTextField saveFile = new JTextField();
         saveFile.setMaximumSize(new Dimension(200,30));
         saveFile.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
 
 
         JButton send = new JButton("Guardar");
         send.setPreferredSize(new Dimension(70,30));
         send.setAlignmentX(Component.CENTER_ALIGNMENT);
-        send.addActionListener(e -> arca.GetCuit(openFile.getText(),viewData));
+        send.addActionListener(e -> arca.SaveData(panel));
         panel.setBorder(new EmptyBorder(20,0,20,0));
 
 

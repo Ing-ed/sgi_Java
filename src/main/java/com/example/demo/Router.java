@@ -39,7 +39,7 @@ public class Router {
     }
 
     public Router(){
-        driver = new DBDriver();
+        driver = new DBDriver("lmc");
     }
 
     //definicion de endpoints
@@ -80,7 +80,8 @@ public class Router {
 
     
     @GetMapping("/dbquery")
-    public String getMethodName(@RequestParam String tableName, @RequestParam (required = false) String[] columns, @RequestParam (required = false) HashMap<String, String> options) {
+    public String getMethodName(@RequestParam (name= "tableName") String tableName, @RequestParam (name="column",required = false) String[] columns, @RequestParam (required = false) HashMap<String, String> options) {
+        System.out.print("query" + tableName);
         if(columns == null || columns.length == 0){
             columns = new String[]{"*"}; 
         }

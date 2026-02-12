@@ -46,13 +46,15 @@ public class DBDriver {
             String colName = md.getColumnLabel(i);
             Object value = res.getObject(i);
             if(value == null){
-                json.addProperty(colName,(String) null);
+                json.add(colName,null);
+            } else if(value instanceof Boolean){
+                json.addProperty(colName,(Boolean) null);
             } else if(value instanceof String){
                 json.addProperty(colName, (String) value);
-            } else if(value instanceof Integer){
-                json.addProperty(colName,(Integer) value);
+            } else if(value instanceof Number){
+                json.addProperty(colName,(Number) value);
             } else {
-                json.addProperty(colName, (Boolean)value);
+                json.addProperty(colName, (String)value);
             }
         }
         return json;
@@ -121,7 +123,7 @@ public class DBDriver {
     public String DbInsert(String body){
         try{
             JsonObject data = JsonParser.parseString(body).getAsJsonObject();
-            Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
+            Connection c = DriverManager.getConnection(url+"/"+dbName, usr, pswd);
             //obtension de las claves
             JsonArray fields = data.get("fields").getAsJsonArray();
             JsonObject first = data.get("fields").getAsJsonArray().get(0).getAsJsonObject();
@@ -178,7 +180,7 @@ public class DBDriver {
          try{
             JsonObject data = JsonParser.parseString(body).getAsJsonObject();
             System.out.println(data + "dataJson");
-            Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
+            Connection c = DriverManager.getConnection(url+"/"+dbName, usr, pswd);
             List<String> keys = new ArrayList<>(data.get("fields").getAsJsonArray().get(0).getAsJsonObject().keySet());
             String colNames = String.join("= ?,", keys) +" = ?"; // columnas que se van a actualizar
             //Construccion de la query
@@ -242,7 +244,7 @@ public class DBDriver {
     public String DBQuery(String tableName, String[] columns, HashMap<String, Object> options){
         System.out.println(columns + "Columns");
         try{
-            Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
+            Connection c = DriverManager.getConnection(url+"/"+dbName, usr, pswd);
             String query = "SELECT ";
             query += String.join(",", columns) + " FROM " + tableName;
             List<Map.Entry<String,Object>> optionList = new ArrayList<>(options.entrySet());
@@ -290,7 +292,7 @@ public class DBDriver {
         try{
             JsonObject data = JsonParser.parseString(body).getAsJsonObject();
             System.out.println(data + "dataJson");
-            Connection c = DriverManager.getConnection(url+"/"+"test", usr, pswd);
+            Connection c = DriverManager.getConnection(url+"/"+dbName, usr, pswd);
             List<String> conds = new ArrayList<>(data.get("conditions").getAsJsonArray().get(0).getAsJsonObject().keySet());
             String condNames = String.join("= ? AND ", conds) +" = ?"; //condiciones para acutalizar
  // columnas que se van a actualizar

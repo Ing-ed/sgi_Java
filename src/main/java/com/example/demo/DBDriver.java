@@ -287,6 +287,57 @@ public class DBDriver {
             return "Error: " + e.getMessage();
         }
     }
+    //Sobrecarga
+    public String DBQuery(String tableName, String[] columns, HashMap<String, Object> options, Integer limit){
+        System.out.println(columns + "Columns");
+        try{
+            Connection c = DriverManager.getConnection(url+"/"+dbName, usr, pswd);
+            String query = "SELECT ";
+            query += String.join(",", columns) + " FROM " + tableName;
+            List<Map.Entry<String,Object>> optionList = new ArrayList<>(options.entrySet());
+            StringJoiner sj = new StringJoiner(
+                (optionList.size() > 0)?" = ? AND" : "",
+                (optionList.size() > 0)? " WHERE ": "",
+                (optionList.size() > 0)?" = ?" : "");
+            for (int i = 0; i< optionList.size(); i++){
+                sj.add(optionList.get(i).getKey());
+            }
+            query += sj.toString();
+            query += " LIMIT ?";
+
+            System.out.println(query);
+            PreparedStatement prep = c.prepareStatement(query);
+            int i = 0;
+            for (i = 0; i< optionList.size(); i=i+1){
+                if(optionList.get(i).getValue() instanceof String){
+                    prep.setString(i+1,(String) optionList.get(i).getValue());
+                } else if(optionList.get(i).getValue() instanceof Integer){
+                    prep.setInt(i+1,(Integer) optionList.get(i).getValue());
+                } else {
+                    prep.setBoolean(i+1,(Boolean) optionList.get(i).getValue());
+                } 
+            }
+            if(limit != null) prep.setInt(i+1, limit);
+            System.out.println("query : " + prep.toString());
+            ResultSet res = prep.executeQuery();
+            JsonObject resp = new JsonObject();
+            JsonArray array = new JsonArray();
+            resp.addProperty("result", "OK");
+            while(res.next()){
+                // System.out.println(res.first());
+                JsonObject json = this.FillJson(res);
+                array.add(json);
+            }
+            resp.add("payload", array);
+            String result = resp.toString();
+            System.out.println(resp);
+            c.close();
+            return result;
+        } catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
+            return "Error: " + e.getMessage();
+        }
+    }
 
     public String DBDelete(String body){
         try{

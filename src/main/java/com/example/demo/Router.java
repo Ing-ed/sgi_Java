@@ -80,7 +80,10 @@ public class Router {
 
     
     @GetMapping("/dbquery")
-    public String getMethodName(@RequestParam (name= "tableName") String tableName, @RequestParam (name="column",required = false) String[] columns, @RequestParam (required = false) HashMap<String, String> options) {
+    public String getMethodName(@RequestParam (name= "tableName") String tableName, 
+                                @RequestParam (name="columns",required = false) String[] columns, 
+                                @RequestParam (required = false) HashMap<String,String> options,
+                                @RequestParam (name="limit", required = false) Integer limit) {
         System.out.print("query" + tableName);
         if(columns == null || columns.length == 0){
             columns = new String[]{"*"}; 
@@ -91,15 +94,22 @@ public class Router {
         HashMap<String, Object> newMap = new HashMap<>();
         if(options != null){
             for (Map.Entry<String,String> entry : options.entrySet()){
-                if(!entry.getKey().equals("tableName") && !entry.getKey().equals("columns")){
-                    newMap.put(entry.getKey(), ParseString(entry.getValue()));
+                if(!entry.getKey().equals("tableName") && !entry.getKey().equals("columns") && !entry.getKey().equals("limit")){
+                    if(entry.getKey().startsWith("filter_")){
+                        newMap.put(entry.getKey().split("_")[1], ParseString(entry.getValue()));
+                    }
                 }
             }
             System.out.println(newMap);
         }
         System.out.println(columns.toString());
         System.out.println(options);
-        String result = driver.DBQuery(tableName, columns, newMap);
+        if (limit != null){
+            System.out.println(limit);
+        }
+        //si limit esta en la request usalo
+
+        String result = (limit != null)? driver.DBQuery(tableName, columns, newMap, limit) : driver.DBQuery(tableName, columns, newMap);
         return result;
     }
 

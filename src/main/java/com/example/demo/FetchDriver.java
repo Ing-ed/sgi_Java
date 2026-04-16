@@ -6,7 +6,6 @@ import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.tomcat.util.json.JSONParser;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -22,7 +21,6 @@ public class FetchDriver {
     private String devToken = "PT0uvVxHeYFRJgpO5PmHy9DT06GMuERTECp76cMQLp4ugZHVw1q5AJtWH2zBxzU1";
     private Map<String,Object> reqStructure;
     private Map<String,String> params;
-    private Map<String, Object> reqPayload;
     public FetchDriver(){
         http = HttpClient.newHttpClient();
     }
@@ -36,7 +34,6 @@ public class FetchDriver {
         //params
         
         //inicializar reqPayload
-        reqPayload = new HashMap<>();
         this.cuit = cuit;
     }
     public String Authenticate(){
@@ -82,15 +79,17 @@ public class FetchDriver {
             return ("Error");
         }
     }
-    public String QueryCuit(String cuits){
+    public String QueryCuit(String cuit){
         // String[] resps ={""};
         // for (String cuit : cuits){
         params.remove("idPersona");
-        params.put("idPersona", cuits);
+        params.put("idPersona", cuit);
         reqStructure.remove("params");
         reqStructure.put("params", params);
         // }
+        System.out.println("Request");
         System.out.println(reqStructure.toString());
+        System.out.println("FinRequest");
         Gson gson = new Gson();
         String requestBody = gson.toJson(reqStructure);
         String res = this.Fetch("requests", requestBody);

@@ -3,8 +3,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileReader;
 
 /**
  * datos necesarios:
@@ -17,70 +15,66 @@ import java.io.FileReader;
  */
 
 public class UI {
-    FetchDriver driver;// = new FetchDriver("20409378472")
-    // List <String> outData = new List<>();
-    private void Open(Component parent, JTextField file){
-        try{
-            JFileChooser fileChooser = new JFileChooser();
-            int fileName = fileChooser.showOpenDialog(parent);
-            System.out.println(fileName);
-            if(fileName == 0){
-                System.out.println(fileChooser.getSelectedFile());
-                file.setText(fileChooser.getSelectedFile().toString());
-            }
-        } catch (Exception e){
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-    private String GetCuit(String fileName){
-        try{
-            // File file = new File(fileName.toString());
-            FileReader fileReader = new FileReader(fileName);
-            int i, j = 0;
-            String buffer = "";
-            while ((i = fileReader.read()) != -1) {
-                buffer += (char)i;
-            }
-            // System.out.println(buffer);
-            String[] cuits = buffer.split("\n");
-            // System.out.println(cuits);
-            for(String cuit : cuits){
-                String res = driver.QueryCuit(cuit);
-                System.out.println("Nueva respuesta \n");
-                System.out.println(res);
-            }
-            return "OK";
-        } catch (Exception e){
-            System.out.println("Error: " + e.getMessage());
-            return "Error";
-        }
-    }
+    private ArcaDriver arca = new ArcaDriver();
     public UI(){
-        driver = new FetchDriver("20409378472");
-        driver.Authenticate();
         JFrame frame = new JFrame("Hola mundo");
-        frame.setSize(400,400);
+        frame.setSize(400,700);
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new EmptyBorder(20, 0, 0, 0));
-        
+
         JTextField openFile = new JTextField();
         openFile.setMaximumSize(new Dimension(200,30));
         openFile.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
+        JTextArea viewData = new JTextArea();
+        viewData.setMaximumSize(new Dimension(50,500));
+        viewData.setEditable(false);
+        viewData.setAlignmentY(Component.CENTER_ALIGNMENT);
+        
         JButton open = new JButton("Abrir");
         open.setPreferredSize(new Dimension(70,30));
         open.setAlignmentX(Component.CENTER_ALIGNMENT);
-        open.addActionListener(e -> this.Open(panel,openFile));
+        open.addActionListener(e -> arca.Open(panel,openFile, viewData));
+        
+        JPanel viewPanel = new JPanel();
+        viewPanel.setLayout(new BoxLayout(viewPanel, BoxLayout.X_AXIS));
+        viewPanel.setBorder(new EmptyBorder(20, 20, 0, 0));
+        
+
+        JScrollPane scrollPanel = new JScrollPane(viewData);
+        scrollPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JPanel navPanel = new JPanel();
+        navPanel.setLayout(new BoxLayout(navPanel,BoxLayout.Y_AXIS));
+        navPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton prev = new JButton("Prev");
+        prev.setPreferredSize(new Dimension(70,30));
+        prev.setAlignmentY(Component.CENTER_ALIGNMENT);
+        prev.addActionListener(e -> arca.Prev(viewData));
+
+        JButton next = new JButton("Next");
+        next.setPreferredSize(new Dimension(70,30));
+        next.setAlignmentY(Component.CENTER_ALIGNMENT);
+        next.addActionListener(e -> arca.Next(viewData));
+
+        navPanel.add(prev);
+        navPanel.add(next);
+
+        viewPanel.add(scrollPanel);
+        viewPanel.add(navPanel);
 
         JTextField saveFile = new JTextField();
         saveFile.setMaximumSize(new Dimension(200,30));
         saveFile.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
 
-        JButton send = new JButton("Consultar");
+
+        JButton send = new JButton("Guardar");
         send.setPreferredSize(new Dimension(70,30));
         send.setAlignmentX(Component.CENTER_ALIGNMENT);
-        send.addActionListener(e -> GetCuit(openFile.getText()));
+        send.addActionListener(e -> arca.SaveData(panel));
         panel.setBorder(new EmptyBorder(20,0,20,0));
 
 
@@ -88,7 +82,8 @@ public class UI {
         panel.add(openFile);
         panel.add(Box.createRigidArea(new Dimension(20,5)));
         panel.add(open);
-        panel.add(Box.createVerticalGlue());
+        // panel.add(Box.createVerticalGlue());
+        panel.add(viewPanel);
         panel.add(saveFile);
         panel.add(send);
         

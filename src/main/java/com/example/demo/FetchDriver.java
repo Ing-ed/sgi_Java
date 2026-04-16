@@ -18,7 +18,8 @@ public class FetchDriver {
     private String token;
     private String sign;
     private String arcaUrl = "https://app.afipsdk.com/api/v1/afip/";
-    private String cuit;
+    private String cuit = "20409378472";
+    private String devToken = "PT0uvVxHeYFRJgpO5PmHy9DT06GMuERTECp76cMQLp4ugZHVw1q5AJtWH2zBxzU1";
     private Map<String,Object> reqStructure;
     private Map<String,String> params;
     private Map<String, Object> reqPayload;
@@ -44,9 +45,12 @@ public class FetchDriver {
         StringBuilder payload = new StringBuilder(payloadStrt)
         .append(this.cuit)
         .append(payloadEnd);
+        System.out.println("payload");
         System.out.println(payload.toString());
         String res = this.Fetch("auth",payload.toString());
         JsonObject auth = JsonParser.parseString(res).getAsJsonObject();
+        System.out.println("auth");
+        System.out.println(auth);
         // System.out.println(auth + "Auth");
         this.sign = auth.get("sign").getAsString();
         this.token = auth.get("token").getAsString();
@@ -58,11 +62,15 @@ public class FetchDriver {
         return ("OK");
     }
     private String Fetch(String urlEndpoint, String body){
+        System.out.println("body");
         System.out.println(body);
+        System.out.println("haciendo fetch a ");
+        System.out.println(arcaUrl+urlEndpoint);
         try{
             HttpRequest req = HttpRequest.newBuilder()
             .uri(URI.create(arcaUrl+urlEndpoint))
             .header("Content-Type","application/json")
+            .header("Authorization","Bearer "+this.devToken)
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build();
             
@@ -78,11 +86,11 @@ public class FetchDriver {
         // String[] resps ={""};
         // for (String cuit : cuits){
         params.remove("idPersona");
-        params.put("idPersona", cuit);
+        params.put("idPersona", cuits);
         reqStructure.remove("params");
         reqStructure.put("params", params);
         // }
-        // System.out.println(reqStructure.toString());
+        System.out.println(reqStructure.toString());
         Gson gson = new Gson();
         String requestBody = gson.toJson(reqStructure);
         String res = this.Fetch("requests", requestBody);

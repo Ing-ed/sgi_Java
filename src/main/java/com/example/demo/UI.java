@@ -18,6 +18,7 @@ import java.io.FileReader;
 
 public class UI {
     FetchDriver driver;// = new FetchDriver("20409378472")
+    // List <String> outData = new List<>();
     private void Open(Component parent, JTextField file){
         try{
             JFileChooser fileChooser = new JFileChooser();
@@ -62,28 +63,35 @@ public class UI {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new EmptyBorder(20, 0, 0, 0));
-        JTextField textFile = new JTextField();
-        textFile.setMaximumSize(new Dimension(200,30));
-        textFile.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JTextField openFile = new JTextField();
+        openFile.setMaximumSize(new Dimension(200,30));
+        openFile.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JButton open = new JButton("Abrir");
         open.setPreferredSize(new Dimension(70,30));
         open.setAlignmentX(Component.CENTER_ALIGNMENT);
-        open.addActionListener(e -> this.Open(panel,textFile));
+        open.addActionListener(e -> this.Open(panel,openFile));
+
+        JTextField saveFile = new JTextField();
+        saveFile.setMaximumSize(new Dimension(200,30));
+        saveFile.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JButton send = new JButton("Consultar");
         send.setPreferredSize(new Dimension(70,30));
         send.setAlignmentX(Component.CENTER_ALIGNMENT);
-        send.addActionListener(e -> GetCuit(textFile.getText()));
+        send.addActionListener(e -> GetCuit(openFile.getText()));
         panel.setBorder(new EmptyBorder(20,0,20,0));
 
 
 
-        panel.add(textFile);
+        panel.add(openFile);
         panel.add(Box.createRigidArea(new Dimension(20,5)));
         panel.add(open);
         panel.add(Box.createVerticalGlue());
+        panel.add(saveFile);
         panel.add(send);
+        
         frame.add(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // frame.pack();

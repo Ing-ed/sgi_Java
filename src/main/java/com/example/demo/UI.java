@@ -17,7 +17,7 @@ import java.awt.*;
 public class UI {
     private ArcaDriver arca = new ArcaDriver();
     public UI(){
-        JFrame frame = new JFrame("Hola mundo");
+        JFrame frame = new JFrame("Constancias de inscripcion");
         frame.setSize(400,700);
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -59,8 +59,14 @@ public class UI {
         next.setAlignmentY(Component.CENTER_ALIGNMENT);
         next.addActionListener(e -> arca.Next(viewData));
 
+        JButton clear = new JButton("Limpiar");
+        clear.setPreferredSize(new Dimension(70,30));
+        clear.setAlignmentY(Component.CENTER_ALIGNMENT);
+        clear.addActionListener(e -> arca.Clear(viewData));
+
         navPanel.add(prev);
         navPanel.add(next);
+        navPanel.add(clear);
 
         viewPanel.add(scrollPanel);
         viewPanel.add(navPanel);
@@ -77,15 +83,18 @@ public class UI {
         send.addActionListener(e -> arca.SaveData(panel));
         panel.setBorder(new EmptyBorder(20,0,20,0));
 
+        //Etiqueta
+        JLabel label = new JLabel("<html><p><br>Desarrollador: Emiliano Dovichi</p></html>");
+        // label.setBorder(new EmptyBorder(10,10,10,10));
 
-
-        panel.add(openFile);
+        // panel.add(openFile);
         panel.add(Box.createRigidArea(new Dimension(20,5)));
         panel.add(open);
         // panel.add(Box.createVerticalGlue());
         panel.add(viewPanel);
-        panel.add(saveFile);
+        // panel.add(saveFile);
         panel.add(send);
+        panel.add(label);
         
         frame.add(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

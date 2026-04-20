@@ -1,8 +1,11 @@
 package com.example.demo;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,18 +20,38 @@ public class FetchDriver {
     private String token;
     private String sign;
     private String arcaUrl = "https://app.afipsdk.com/api/v1/afip/";
-    private String cuit = "20409378472";
-    private String devToken = "PT0uvVxHeYFRJgpO5PmHy9DT06GMuERTECp76cMQLp4ugZHVw1q5AJtWH2zBxzU1";
+    private String cuit = "20344142131";
+    // private String accessToken;
+    //certificado y clave privada
+    private String accessToken;// = "utDqGUXfL6Ttg49jY7gATOAZAey5P6ovxhWNpFjxomYXoOONZrx1MZffg1XdyPiQ";
+    private String privateKey;
+    private String certificate;
     private Map<String,Object> reqStructure;
     private Map<String,String> params;
+    //Constructor
     public FetchDriver(){
         http = HttpClient.newHttpClient();
+        try{
+            this.privateKey = Files.readString(Path.of("recursos/prodCertKey.key"));
+            this.certificate = Files.readString(Path.of("recursos/CertificateProd.crt"));
+            this.accessToken = Files.readString(Path.of("recutsos/tokenAccess.txt"));
+        } catch (IOException e){
+            System.out.println("Error " + e.toString());
+        }
     }
+    //Constructor
     public FetchDriver(String cuit){
+         try{
+            this.privateKey = Files.readString(Path.of("recursos/prodCertKey.key"));
+            this.certificate = Files.readString(Path.of("recursos/CertificateProd.crt"));
+            this.accessToken = Files.readString(Path.of("recursos/tokenAccess.txt"));
+        } catch (IOException e){
+            System.out.println("Error " + e.toString());
+        }
         http = HttpClient.newHttpClient();
         //reqStructure
         reqStructure = new HashMap<>();
-        reqStructure.put("environment", "dev");
+        reqStructure.put("environment", "prod");
         reqStructure.put("method", "getPersona_v2");
         reqStructure.put("wsid", "ws_sr_constancia_inscripcion");
         //params
@@ -37,13 +60,23 @@ public class FetchDriver {
         this.cuit = cuit;
     }
     public String Authenticate(){
-        String payloadStrt = "{\"environment\":\"dev\",\"tax_id\":\""; //insertar cuit
-        String payloadEnd = "\",\"wsid\":\"ws_sr_constancia_inscripcion\"}";
-        StringBuilder payload = new StringBuilder(payloadStrt)
-        .append(this.cuit)
-        .append(payloadEnd);
-        System.out.println("payload");
+        JsonObject payload = new JsonObject();
+        // try{
+        //     this.accessToken = Files.readString(Path.of("recutsos/tokenAccess.txt"));
+        // } catch (IOException e){
+        //     System.out.println("Error -> "+ e.toString());
+        // }
+        
+
+        payload.addProperty("environment", "prod");
+        payload.addProperty("tax_id", this.cuit);
+        payload.addProperty("force_create", true);
+        payload.addProperty("wsid", "ws_sr_constancia_inscripcion");
+
+        payload.addProperty("cert", this.certificate);
+        payload.addProperty("key", this.privateKey);
         System.out.println(payload.toString());
+        // String body = payload.toString();
         String res = this.Fetch("auth",payload.toString());
         JsonObject auth = JsonParser.parseString(res).getAsJsonObject();
         System.out.println("auth");
@@ -67,7 +100,7 @@ public class FetchDriver {
             HttpRequest req = HttpRequest.newBuilder()
             .uri(URI.create(arcaUrl+urlEndpoint))
             .header("Content-Type","application/json")
-            .header("Authorization","Bearer "+this.devToken)
+            .header("Authorization","Bearer "+this.accessToken)
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build();
             

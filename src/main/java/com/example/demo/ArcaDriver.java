@@ -1,3 +1,7 @@
+/**
+ * Esta clase contiene los metodos para el estructurado de los campos de las respuestas del server
+ * a las peticiones realizadas y posteriormente guardar la informacion para la DB
+ */
 package com.example.demo;
 
 
@@ -23,7 +27,7 @@ public class ArcaDriver {
     private List<String> outData;
     private int index;
     public ArcaDriver(){
-        driver = new FetchDriver("20409378472");
+        driver = new FetchDriver("20344142131");
         outData = new ArrayList<String>();
         index = 0;
         driver.Authenticate();
@@ -39,7 +43,13 @@ public class ArcaDriver {
         JsonArray actividades = datosRegimenGral.get("actividad").getAsJsonArray();
         JsonObject impuesto = datosRegimenGral.get("impuesto").getAsJsonArray().get(0).getAsJsonObject();
         //Obtener los datos
-        String razonSocial = datosGenerales.get("razonSocial").getAsString();
+        String razonSocial = "";
+        String tipoPersona = datosGenerales.get("tipoPersona").getAsString();
+        if(!"FISICA".equals(tipoPersona)){
+            razonSocial = datosGenerales.get("razonSocial").getAsString();
+        } else {
+            razonSocial = datosGenerales.get("apellido").getAsString() + " " + datosGenerales.get("nombre").getAsString();
+        }
         long cuit = datosGenerales.get("idPersona").getAsLong();
         String codigoPostal = domicilioFiscal.get("codPostal").getAsString();
         String descripcionProvincia = domicilioFiscal.get("descripcionProvincia").getAsString(); //jurisdiccion
@@ -127,7 +137,10 @@ public class ArcaDriver {
     }
 
     public void Open(Component parent, JTextField file, JTextArea viewData){
+        outData.clear();
+        file.setText("");
         try{
+            file.setText("");
             JFileChooser fileChooser = new JFileChooser();
             int fileName = fileChooser.showOpenDialog(parent);
             System.out.println(fileName);
@@ -164,6 +177,7 @@ public class ArcaDriver {
 
 
             viewData.setText(gson.toJson(viewObject));
+            fileReader.close();
             // System.out.println("salida\n");
             // System.out.println(outData.toString());
 
@@ -182,6 +196,10 @@ public class ArcaDriver {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonObject viewObject = JsonParser.parseString(outData.get(index)).getAsJsonObject();
         viewData.setText(gson.toJson(viewObject));
+    }
+    public void Clear(JTextArea viewData){
+        outData.clear();
+        viewData.setText("");
     }
 }
 
